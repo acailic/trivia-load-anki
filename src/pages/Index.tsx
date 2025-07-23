@@ -19,6 +19,40 @@ const Index = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const { toast } = useToast();
 
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    let i = 0;
+
+    while (i < line.length) {
+      const char = line[i];
+      
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          // Handle escaped quotes ("")
+          current += '"';
+          i += 2;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+          i++;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // Split only on commas outside quotes
+        result.push(current.trim());
+        current = '';
+        i++;
+      } else {
+        current += char;
+        i++;
+      }
+    }
+    
+    result.push(current.trim());
+    return result;
+  };
+
   const parseEpisodeQuestions = (episode: string): Question[] => {
     const fileContent = sessionStorage.getItem('triviaFileContent');
     if (!fileContent) return [];
@@ -29,7 +63,7 @@ const Index = () => {
 
     for (const line of lines) {
       if (line.trim()) {
-        const columns = line.split(',');
+        const columns = parseCSVLine(line);
         
         // Check if this is the episode header
         if (columns[0]?.trim() === episode) {
@@ -46,8 +80,8 @@ const Index = () => {
         if (isInEpisode && columns[1]?.trim()) {
           const question: Question = {
             number: columns[1].trim(),
-            question: columns[2]?.trim() || '',
-            answer: columns[3]?.trim() || ''
+            question: columns[2]?.trim().replace(/^"|"$/g, '') || '', // Remove surrounding quotes
+            answer: columns[3]?.trim().replace(/^"|"$/g, '') || ''     // Remove surrounding quotes
           };
           
           if (question.question && question.answer) {

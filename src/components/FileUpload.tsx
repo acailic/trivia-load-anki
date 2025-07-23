@@ -14,13 +14,47 @@ export const FileUpload = ({ onFileLoaded }: FileUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    let i = 0;
+
+    while (i < line.length) {
+      const char = line[i];
+      
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          // Handle escaped quotes ("")
+          current += '"';
+          i += 2;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+          i++;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // Split only on commas outside quotes
+        result.push(current.trim());
+        current = '';
+        i++;
+      } else {
+        current += char;
+        i++;
+      }
+    }
+    
+    result.push(current.trim());
+    return result;
+  };
+
   const parseCSV = (text: string): string[] => {
     const lines = text.split('\n');
     const episodes = new Set<string>();
     
     for (const line of lines) {
       if (line.trim()) {
-        const columns = line.split(',');
+        const columns = parseCSVLine(line);
         const episode = columns[0]?.trim();
         
         // Only add episodes that contain actual episode dates (not empty or just commas)
