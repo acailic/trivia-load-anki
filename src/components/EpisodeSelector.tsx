@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shuffle, Play } from 'lucide-react';
+import { Shuffle, Play, ArrowLeft } from 'lucide-react';
 
 interface EpisodeSelectorProps {
   episodes: string[];
   onEpisodeSelected: (episode: string) => void;
+  onBack?: () => void;
 }
 
-export const EpisodeSelector = ({ episodes, onEpisodeSelected }: EpisodeSelectorProps) => {
+export const EpisodeSelector = ({ episodes, onEpisodeSelected, onBack }: EpisodeSelectorProps) => {
   const [selectedEpisode, setSelectedEpisode] = useState<string | null>(null);
 
   const selectRandomEpisode = () => {
@@ -25,7 +26,12 @@ export const EpisodeSelector = ({ episodes, onEpisodeSelected }: EpisodeSelector
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="text-center">
+      <CardHeader className="text-center relative">
+        {onBack && (
+          <Button variant="ghost" onClick={onBack} className="absolute left-0 top-0 p-2">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+        )}
         <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
           Slagalica Trivia
         </CardTitle>

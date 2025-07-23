@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileUpload } from '@/components/FileUpload';
+import { FileSelector } from '@/components/FileSelector';
 import { EpisodeSelector } from '@/components/EpisodeSelector';
 import { QuizCard } from '@/components/QuizCard';
 import { useToast } from '@/hooks/use-toast';
@@ -10,10 +10,10 @@ interface Question {
   answer: string;
 }
 
-type AppState = 'upload' | 'select' | 'quiz';
+type AppState = 'selectFile' | 'selectEpisode' | 'quiz';
 
 const Index = () => {
-  const [appState, setAppState] = useState<AppState>('upload');
+  const [appState, setAppState] = useState<AppState>('selectFile');
   const [episodes, setEpisodes] = useState<string[]>([]);
   const [selectedEpisode, setSelectedEpisode] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -94,9 +94,9 @@ const Index = () => {
     return episodeQuestions;
   };
 
-  const handleFileLoaded = (episodeList: string[]) => {
+  const handleFileSelected = (episodeList: string[], fileName: string) => {
     setEpisodes(episodeList);
-    setAppState('select');
+    setAppState('selectEpisode');
   };
 
   const handleEpisodeSelected = (episode: string) => {
@@ -122,13 +122,20 @@ const Index = () => {
   };
 
   const handleBackToSelect = () => {
-    setAppState('select');
+    setAppState('selectEpisode');
     setSelectedEpisode('');
     setQuestions([]);
   };
 
   const handleNewEpisode = () => {
-    setAppState('select');
+    setAppState('selectEpisode');
+    setSelectedEpisode('');
+    setQuestions([]);
+  };
+
+  const handleBackToFiles = () => {
+    setAppState('selectFile');
+    setEpisodes([]);
     setSelectedEpisode('');
     setQuestions([]);
   };
@@ -136,25 +143,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="container mx-auto">
-        {appState === 'upload' && (
+        {appState === 'selectFile' && (
           <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-8">
             <div className="text-center space-y-4">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
                 Slagalica Trivia
               </h1>
               <p className="text-xl text-muted-foreground max-w-md">
-                Load your trivia CSV file and start learning with flashcards
+                Select your trivia collection and start learning with flashcards
               </p>
             </div>
-            <FileUpload onFileLoaded={handleFileLoaded} />
+            <FileSelector onFileSelected={handleFileSelected} />
           </div>
         )}
 
-        {appState === 'select' && (
+        {appState === 'selectEpisode' && (
           <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-8">
             <EpisodeSelector 
               episodes={episodes} 
-              onEpisodeSelected={handleEpisodeSelected} 
+              onEpisodeSelected={handleEpisodeSelected}
+              onBack={handleBackToFiles}
             />
           </div>
         )}
