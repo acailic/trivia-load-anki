@@ -9,8 +9,8 @@ interface FileSelectorProps {
 }
 
 const availableFiles = [
-  { name: 'Anansi Slagalica Questions.csv', displayName: 'Slagalica Questions (Standard)' },
-  { name: 'Anansi Slagalica Questions-1080p.csv', displayName: 'Slagalica Questions (1080p)' }
+  { name: 'AnansiSlagalicaQuestions.csv', displayName: 'Slagalica Questions (Standard)' },
+  { name: 'AnansiSlagalicaQuestions-1080p.csv', displayName: 'Slagalica Questions (1080p)' }
 ];
 
 export const FileSelector = ({ onFileSelected }: FileSelectorProps) => {
